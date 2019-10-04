@@ -4,6 +4,8 @@ namespace DDD.School
 {
     public class StudentCourseStatus : ValueObject<StudentCourseStatus>
     {
+        private StudentCourseStatus() { }
+
         public StudentCourseStatus(Student student, Course course, Statuses status, DateTime date)
         {
             if(null == student)
@@ -30,10 +32,10 @@ namespace DDD.School
             return HashCode.Combine(StudentId, CourseId, Status);
         }
 
-        public Guid StudentId { get; }
-        public Guid CourseId { get; }
-        public Statuses Status { get; }
-        public DateTime Date { get; }
+        public Guid StudentId { get; private set; }
+        public Guid CourseId { get; private set; }
+        public Statuses Status { get; private set; }
+        public DateTime Date { get; private set; }
 
         public enum Statuses
         {

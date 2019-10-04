@@ -38,7 +38,7 @@ namespace DDD.School.Tests.Unit.Commands
             var course = new Course(Guid.NewGuid(), "existing course");
 
             var repo = NSubstitute.Substitute.For<ICoursesRepository>();
-            repo.FindAsync(Arg.Any<Func<Course, bool>>(), Arg.Any<CancellationToken>())
+            repo.FindAsync(null, Arg.Any<CancellationToken>())
                 .ReturnsForAnyArgs(new[]{course});
 
             var unitOfWork = NSubstitute.Substitute.For<ISchoolUnitOfWork>();
