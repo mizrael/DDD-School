@@ -8,10 +8,10 @@ using Xunit;
 
 namespace DDD.School.Persistence.SQL.Tests.Integration.Commands
 {
-    public class CreateCourseTests : IClassFixture<SchoolDbContextFixture>
+    public class CreateCourseHandlerTests : IClassFixture<SchoolDbContextFixture>
     {
         private readonly SchoolDbContextFixture _fixture;
-        public CreateCourseTests(SchoolDbContextFixture fixture)
+        public CreateCourseHandlerTests(SchoolDbContextFixture fixture)
         {
             _fixture = fixture;
         }
@@ -21,10 +21,10 @@ namespace DDD.School.Persistence.SQL.Tests.Integration.Commands
         {
             await using var dbContext = _fixture.BuildDbContext();
 
-            var studentsRepository = new StudentsRepository(dbContext);
+            var studentsRepo = new StudentsRepository(dbContext);
             var coursesRepo = new CoursesRepository(dbContext);
 
-            var unitOfWork = new SchoolUnitOfWork(dbContext, coursesRepo, studentsRepository);
+            var unitOfWork = new SchoolUnitOfWork(dbContext, coursesRepo, studentsRepo);
 
             var sut = new CreateCourseHandler(new NullValidator<CreateCourse>(), unitOfWork);
 
