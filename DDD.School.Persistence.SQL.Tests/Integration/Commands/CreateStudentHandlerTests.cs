@@ -32,11 +32,11 @@ namespace DDD.School.Persistence.SQL.Tests.Integration.Commands
             var command = new CreateStudent(Guid.NewGuid(), "new", "student");
             await sut.Handle(command, CancellationToken.None);
 
-            var createdCourse = await studentsRepo.FindByIdAsync(command.StudentId, CancellationToken.None);
-            createdCourse.Should().NotBeNull();
-            createdCourse.Id.Should().Be(command.StudentId);
-            createdCourse.Firstname.Should().Be(command.StudentFirstname);
-            createdCourse.Lastname.Should().Be(command.StudentLastname);
+            var createdStudent = await studentsRepo.FindByIdAsync(command.StudentId, CancellationToken.None);
+            createdStudent.Should().NotBeNull();
+            createdStudent.Id.Should().Be(command.StudentId);
+            createdStudent.Firstname.Should().Be(command.StudentFirstname);
+            createdStudent.Lastname.Should().Be(command.StudentLastname);
         }
     }
 }
