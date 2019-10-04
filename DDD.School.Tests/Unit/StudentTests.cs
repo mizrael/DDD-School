@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using FluentAssertions;
 using Xunit;
 
@@ -68,6 +69,21 @@ namespace DDD.School.Tests.Unit
         }
 
         [Fact]
+        public void Enroll_should_add_student_to_course_if_he_has_withdrawn()
+        {
+            var course = new Course(Guid.NewGuid(), "course");
+            var sut = new Student(Guid.NewGuid(), "firstname", "lastname");
+
+            sut.Enroll(course);
+            sut.Withdraw(course);
+            sut.Enroll(course);
+
+            sut.Courses.ElementAt(0).Status.Should().Be(StudentCourseStatus.Statuses.Enrolled);
+            sut.Courses.ElementAt(1).Status.Should().Be(StudentCourseStatus.Statuses.Withdrawn);
+            sut.Courses.ElementAt(2).Status.Should().Be(StudentCourseStatus.Statuses.Enrolled);
+        }
+
+        [Fact]
         public void Withdraw_should_update_course_status()
         {
             var course = new Course(Guid.NewGuid(), "course");
@@ -76,8 +92,8 @@ namespace DDD.School.Tests.Unit
             sut.Enroll(course);
             sut.Withdraw(course);
 
-            sut.Courses.Count.Should().Be(1);
-            sut.Courses.Should().Contain(c => c.Status == StudentCourseStatus.Statuses.Withdrawn && c.StudentId == sut.Id && c.CourseId == course.Id);
+            sut.Courses.ElementAt(0).Status.Should().Be(StudentCourseStatus.Statuses.Enrolled);
+            sut.Courses.ElementAt(1).Status.Should().Be(StudentCourseStatus.Statuses.Withdrawn);
         }
 
         [Fact]
@@ -87,8 +103,55 @@ namespace DDD.School.Tests.Unit
             var sut = new Student(Guid.NewGuid(), "firstname", "lastname");
 
             var ex = Assert.Throws<ArgumentException>(() => sut.Withdraw(course));
-            ex.Message.Should().Contain(course.Id.ToString());
+            ex.Message.Should().Be($"student {sut.Id} not enrolled in course {course.Id}");
         }
 
+        [Fact]
+        public void Withdraw_should_throw_if_student_has_completed_course()
+        {
+            var course = new Course(Guid.NewGuid(), "course");
+            var sut = new Student(Guid.NewGuid(), "firstname", "lastname");
+
+            sut.Enroll(course);
+            sut.Complete(course);
+
+            var ex = Assert.Throws<ArgumentException>(() => sut.Withdraw(course));
+            ex.Message.Should().Be($"student {sut.Id} has completed course {course.Id} already");
+        }
+
+        [Fact]
+        public void Complete_should_throw_if_student_not_enrolled()
+        {
+            var course = new Course(Guid.NewGuid(), "course");
+            var sut = new Student(Guid.NewGuid(), "firstname", "lastname");
+            
+            var ex = Assert.Throws<ArgumentException>(() => sut.Complete(course));
+            ex.Message.Should().Be($"student {sut.Id} not enrolled in course {course.Id}");
+        }
+
+        [Fact]
+        public void Complete_should_throw_if_student_has_withdrawn()
+        {
+            var course = new Course(Guid.NewGuid(), "course");
+            var sut = new Student(Guid.NewGuid(), "firstname", "lastname");
+
+            sut.Enroll(course);
+            sut.Withdraw(course);
+
+            var ex = Assert.Throws<ArgumentException>(() => sut.Complete(course));
+            ex.Message.Should().Be($"student {sut.Id} has withdrawn from course {course.Id}");
+        }
+
+        [Fact]
+        public void Complete_should_succeed_when_student_is_enrolled()
+        {
+            var course = new Course(Guid.NewGuid(), "course");
+            var sut = new Student(Guid.NewGuid(), "firstname", "lastname");
+
+            sut.Enroll(course);
+            sut.Complete(course);
+            sut.Courses.ElementAt(0).Status.Should().Be(StudentCourseStatus.Statuses.Enrolled);
+            sut.Courses.ElementAt(1).Status.Should().Be(StudentCourseStatus.Statuses.Completed);
+        }
     }
 }

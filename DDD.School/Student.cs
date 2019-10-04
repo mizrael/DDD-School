@@ -32,7 +32,7 @@ namespace DDD.School
             Lastname = value;
         }
 
-        private readonly HashSet<StudentCourseStatus> _courses = new HashSet<StudentCourseStatus>();
+        private readonly List<StudentCourseStatus> _courses = new List<StudentCourseStatus>();
         public IReadOnlyCollection<StudentCourseStatus> Courses => _courses.ToImmutableArray();
 
         public void Enroll(Course course)
@@ -40,18 +40,47 @@ namespace DDD.School
             if(null == course)
                 throw new ArgumentNullException(nameof(course));
 
-            _courses.Add(new StudentCourseStatus(this, course, StudentCourseStatus.Statuses.Enrolled));
+            var oldCourses = _courses.Where(c => c.CourseId == course.Id).ToArray();
+
+            var isEmpty = !oldCourses.Any();
+            var hasWithdrawn = !isEmpty && oldCourses.OrderByDescending(c => c.Date).First().Status == StudentCourseStatus.Statuses.Withdrawn;
+
+            if (isEmpty || hasWithdrawn)
+                _courses.Add(new StudentCourseStatus(this, course, StudentCourseStatus.Statuses.Enrolled, DateTime.UtcNow));
         }
 
         public void Withdraw(Course course)
         {
             if (null == course)
                 throw new ArgumentNullException(nameof(course));
-            if(_courses.All(c => c.CourseId != course.Id))
-                throw new ArgumentException($"student {this.Id} not enrolled in course {course.Id}");
 
-            _courses.RemoveWhere(c => c.CourseId == course.Id);
-            _courses.Add(new StudentCourseStatus(this, course, StudentCourseStatus.Statuses.Withdrawn));
+            var oldCourses = _courses.Where(c => c.CourseId == course.Id).ToArray();
+
+            var isEmpty = !oldCourses.Any();
+
+            var isCompleted = !isEmpty && oldCourses.OrderByDescending(c => c.Date).First().Status == StudentCourseStatus.Statuses.Completed;
+            if(isCompleted)
+                throw new ArgumentException($"student {this.Id} has completed course {course.Id} already");
+
+            var isEnrolled = !isEmpty && oldCourses.OrderByDescending(c => c.Date).First().Status == StudentCourseStatus.Statuses.Enrolled;
+            if (!isEnrolled)
+                throw new ArgumentException($"student {this.Id} not enrolled in course {course.Id}");
+            
+            _courses.Add(new StudentCourseStatus(this, course, StudentCourseStatus.Statuses.Withdrawn, DateTime.UtcNow));
+        }
+
+        public void Complete(Course course)
+        {
+            if (null == course)
+                throw new ArgumentNullException(nameof(course));
+
+            var oldCourses = _courses.Where(c => c.CourseId == course.Id).ToArray();
+            if (!oldCourses.Any())
+                throw new ArgumentException($"student {this.Id} not enrolled in course {course.Id}");
+            if(oldCourses.Any(c => c.Status == StudentCourseStatus.Statuses.Withdrawn))
+                throw new ArgumentException($"student {this.Id} has withdrawn from course {course.Id}");
+
+            _courses.Add(new StudentCourseStatus(this, course, StudentCourseStatus.Statuses.Completed, DateTime.UtcNow));
         }
     }
 }
