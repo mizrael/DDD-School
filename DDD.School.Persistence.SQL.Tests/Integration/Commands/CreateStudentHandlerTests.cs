@@ -8,6 +8,7 @@ using Xunit;
 
 namespace DDD.School.Persistence.SQL.Tests.Integration.Commands
 {
+    [Trait("Category", "Integration")]
     public class CreateStudentHandlerTests : IClassFixture<SchoolDbContextFixture>
     {
         private readonly SchoolDbContextFixture _fixture;
