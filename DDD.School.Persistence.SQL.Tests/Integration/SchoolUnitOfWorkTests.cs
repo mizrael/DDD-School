@@ -25,9 +25,10 @@ namespace DDD.School.Persistence.SQL.Tests.Integration
 
             var studentsRepo = new StudentsRepository(dbContext);
             var coursesRepo = new CoursesRepository(dbContext);
+            var messagesRepository = NSubstitute.Substitute.For<IMessagesRepository>();
             var eventSerializer = NSubstitute.Substitute.For<IEventSerializer>();
 
-            var sut = new SchoolUnitOfWork(dbContext, coursesRepo, studentsRepo, eventSerializer);
+            var sut = new SchoolUnitOfWork(dbContext, coursesRepo, studentsRepo, messagesRepository, eventSerializer);
 
             var course = new Course(Guid.NewGuid(), "course");
             await sut.CoursesRepository.CreateAsync(course, CancellationToken.None);

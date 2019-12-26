@@ -4,5 +4,6 @@
     {
         ICoursesRepository CoursesRepository { get; }
         IStudentsRepository StudentsRepository { get; }
+        IMessagesRepository MessagesRepository { get; }
     }
 }

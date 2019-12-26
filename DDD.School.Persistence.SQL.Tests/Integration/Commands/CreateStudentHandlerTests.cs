@@ -25,10 +25,10 @@ namespace DDD.School.Persistence.SQL.Tests.Integration.Commands
 
             var studentsRepo = new StudentsRepository(dbContext);
             var coursesRepo = new CoursesRepository(dbContext);
-
+            var messagesRepository = NSubstitute.Substitute.For<IMessagesRepository>();
             var eventSerializer = NSubstitute.Substitute.For<IEventSerializer>();
 
-            var unitOfWork = new SchoolUnitOfWork(dbContext, coursesRepo, studentsRepo, eventSerializer);
+            var unitOfWork = new SchoolUnitOfWork(dbContext, coursesRepo, studentsRepo, messagesRepository, eventSerializer);
 
             var sut = new CreateStudentHandler(new NullValidator<CreateStudent>(), unitOfWork);
 

@@ -11,4 +11,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DDD.School\DDD.School.csproj" />
+  </ItemGroup>
+
 </Project>

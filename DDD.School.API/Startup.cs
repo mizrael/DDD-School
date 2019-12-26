@@ -1,4 +1,5 @@
 using DDD.School.API.Services;
+using DDD.School.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -21,8 +22,10 @@ namespace DDD.School.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSingleton(new EventDispatcherOptions(TimeSpan.FromSeconds(10)));
-            services.AddHostedService<EventDispatcher>();
+            services.AddSingleton<IMessagePublisher, FakeMessagePublisher>();
+            services.AddSingleton<IMessageProcessor, MessageProcessor>();
+            services.AddSingleton(new MessageProcessorTaskOptions(TimeSpan.FromSeconds(10), 10));
+            services.AddHostedService<MessagesProcessorTask>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,7 +47,7 @@ namespace DDD.School.API
                 endpoints.MapControllers();
             });
 
-            //app.UseWelcomePage();
+            app.UseWelcomePage();
         }
     }
 }

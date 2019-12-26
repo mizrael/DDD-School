@@ -1,5 +1,5 @@
 ﻿using System;
-using DDD.School.Events;
+using System.Threading.Tasks;
 using DDD.School.Services;
 using FluentAssertions;
 using NSubstitute;
@@ -13,12 +13,10 @@ namespace DDD.School.Tests.Unit
         [Fact]
         public void FromDomainEvent_should_create_message()
         {
-            var course = new Course(Guid.NewGuid(), "course");
-            var student = new Student(Guid.NewGuid(), "firstname", "lastname");
-            var @event = new StudentEnrolled(student, course);
+            var @event = new FakeEvent() { Text = Guid.NewGuid().ToString() };
 
             var eventSerializer = Substitute.For<IEventSerializer>();
-            var expectedPayload = $"{student.Id}_{course.Id}";
+            var expectedPayload = $"{@event.Text}";
             eventSerializer.Serialize(@event)
                 .Returns(expectedPayload);
 
@@ -26,7 +24,31 @@ namespace DDD.School.Tests.Unit
             sut.Should().NotBeNull();
             sut.Payload.Should().Be(expectedPayload);
             sut.ProcessedAt.Should().BeNull();
-            sut.Type.Should().Be(typeof(StudentEnrolled).FullName);
+            sut.Type.Should().Be(typeof(FakeEvent).FullName);
         }
+
+        [Fact]
+        public async Task Process_should_publish_message()
+        {
+            var @event = new FakeEvent() { Text = Guid.NewGuid().ToString() };
+
+            var eventSerializer = Substitute.For<IEventSerializer>();
+            
+            var sut = Message.FromDomainEvent(@event, eventSerializer);
+
+            sut.ProcessedAt.Should().BeNull();
+
+            var publisher = Substitute.For<IMessagePublisher>();
+
+            await sut.Process(publisher);
+
+            publisher.Received(1).PublishAsync(sut);
+
+            sut.ProcessedAt.Should().NotBeNull();
+        }
+    }
+
+    internal class FakeEvent : IDomainEvent {
+        public string Text;
     }
 }

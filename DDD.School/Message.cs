@@ -1,5 +1,6 @@
 ﻿using DDD.School.Services;
 using System;
+using System.Threading.Tasks;
 
 namespace DDD.School
 {
@@ -14,9 +15,15 @@ namespace DDD.School
         }
 
         public DateTime CreatedAt { get; }
-        public DateTime? ProcessedAt { get; }
+        public DateTime? ProcessedAt { get; private set; }
         public string Type { get; }
         public string Payload { get; }
+
+        public async Task Process(IMessagePublisher publisher)
+        {
+            await publisher.PublishAsync(this);
+            this.ProcessedAt = DateTime.UtcNow;
+        }
 
         public static Message FromDomainEvent<TE>(TE @event, IEventSerializer serializer) where TE : IDomainEvent
         {
@@ -29,5 +36,6 @@ namespace DDD.School
 
             return new Message(Guid.NewGuid(), DateTime.UtcNow, type, serializer.Serialize(@event));
         }
+
     }
 }
