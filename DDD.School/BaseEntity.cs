@@ -4,7 +4,8 @@ using System.Collections.Immutable;
 
 namespace DDD.School
 {
-    public abstract class BaseEntity<TKey>
+
+    public abstract class BaseEntity<TKey> : IHasEvents
     {
         protected BaseEntity()
         {
@@ -14,6 +15,11 @@ namespace DDD.School
         private readonly IList<IDomainEvent> _events;
 
         public IReadOnlyCollection<IDomainEvent> Events => _events.ToImmutableArray();
+
+        public void ClearEvents()
+        {
+            _events.Clear();
+        }
 
         protected void AddEvent<TE>(TE @event) where TE:IDomainEvent
         {
@@ -45,6 +51,4 @@ namespace DDD.School
             return !(entity1 == entity2);
         }
     }
-
-    public interface IDomainEvent { }
 }

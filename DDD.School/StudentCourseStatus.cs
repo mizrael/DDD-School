@@ -2,40 +2,21 @@
 
 namespace DDD.School
 {
-    public class StudentCourseStatus : ValueObject<StudentCourseStatus>
+    public class StudentCourseStatus : BaseEntity<Guid>
     {
-        private StudentCourseStatus() { }
-
-        public StudentCourseStatus(Student student, Course course, Statuses status, DateTime date)
+        private StudentCourseStatus(Guid id, Guid studentId, Guid courseId, Statuses status, DateTime createdAt)
         {
-            if(null == student)
-                throw new ArgumentNullException(nameof(student));
-            if (null == course)
-                throw new ArgumentNullException(nameof(course));
-
-            this.StudentId = student.Id;
-            this.CourseId = course.Id;
+            this.Id = id;
+            this.StudentId = studentId;
+            this.CourseId = courseId;
             this.Status = status;
-            Date = date;
-        }
-
-        protected override bool EqualsCore(StudentCourseStatus other)
-        {
-            return other != null &&
-                   StudentId == other.StudentId &&
-                   CourseId == other.CourseId &&
-                   Status == other.Status;
-        }
-
-        protected override int GetHashCodeCore()
-        {
-            return HashCode.Combine(StudentId, CourseId, Status);
+            this.CreatedAt = createdAt;
         }
 
         public Guid StudentId { get; private set; }
         public Guid CourseId { get; private set; }
         public Statuses Status { get; private set; }
-        public DateTime Date { get; private set; }
+        public DateTime CreatedAt { get; private set; }
 
         public enum Statuses
         {
@@ -43,5 +24,9 @@ namespace DDD.School
             Withdrawn,
             Completed
         }
+
+        public static StudentCourseStatus Enrolled(Student student, Course course) => new StudentCourseStatus(Guid.NewGuid(), student.Id, course.Id, Statuses.Enrolled, DateTime.UtcNow);
+        public static StudentCourseStatus Withdrawn(Student student, Course course) => new StudentCourseStatus(Guid.NewGuid(), student.Id, course.Id, Statuses.Withdrawn, DateTime.UtcNow);
+        public static StudentCourseStatus Completed(Student student, Course course) => new StudentCourseStatus(Guid.NewGuid(), student.Id, course.Id, Statuses.Completed, DateTime.UtcNow);
     }
 }

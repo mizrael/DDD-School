@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DDD.School.Commands;
 using DDD.School.Persistence.SQL.Tests.Fixtures;
+using DDD.School.Services;
 using FluentAssertions;
 using Xunit;
 
@@ -24,8 +25,9 @@ namespace DDD.School.Persistence.SQL.Tests.Integration.Commands
 
             var studentsRepo = new StudentsRepository(dbContext);
             var coursesRepo = new CoursesRepository(dbContext);
+            var eventSerializer = NSubstitute.Substitute.For<IEventSerializer>();
 
-            var unitOfWork = new SchoolUnitOfWork(dbContext, coursesRepo, studentsRepo);
+            var unitOfWork = new SchoolUnitOfWork(dbContext, coursesRepo, studentsRepo, eventSerializer);
 
             var sut = new CreateCourseHandler(new NullValidator<CreateCourse>(), unitOfWork);
 

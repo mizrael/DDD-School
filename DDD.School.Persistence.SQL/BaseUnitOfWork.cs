@@ -15,10 +15,14 @@ namespace DDD.School.Persistence.SQL
             DbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public Task CommitAsync(CancellationToken cancellationToken)
+        public async Task CommitAsync(CancellationToken cancellationToken)
         {
-            return DbContext.SaveChangesAsync(cancellationToken);
+            await BeforeCommitAsync(cancellationToken);
+
+            await DbContext.SaveChangesAsync(cancellationToken);
         }
+
+        protected abstract Task BeforeCommitAsync(CancellationToken cancellationToken);
         
         public async Task<ITransaction> BeginTransactionAsync(CancellationToken cancellationToken = default(CancellationToken))
         {

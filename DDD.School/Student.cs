@@ -44,11 +44,11 @@ namespace DDD.School
             var oldCourses = _courses.Where(c => c.CourseId == course.Id).ToArray();
 
             var isEmpty = !oldCourses.Any();
-            var hasWithdrawn = !isEmpty && oldCourses.OrderByDescending(c => c.Date).First().Status == StudentCourseStatus.Statuses.Withdrawn;
+            var hasWithdrawn = !isEmpty && oldCourses.OrderByDescending(c => c.CreatedAt).First().Status == StudentCourseStatus.Statuses.Withdrawn;
 
             if (isEmpty || hasWithdrawn)
             {
-                _courses.Add(new StudentCourseStatus(this, course, StudentCourseStatus.Statuses.Enrolled, DateTime.UtcNow));
+                _courses.Add(StudentCourseStatus.Enrolled(this, course));
                 this.AddEvent(new StudentEnrolled(this, course));
             }
         }
@@ -62,15 +62,15 @@ namespace DDD.School
 
             var isEmpty = !oldCourses.Any();
 
-            var isCompleted = !isEmpty && oldCourses.OrderByDescending(c => c.Date).First().Status == StudentCourseStatus.Statuses.Completed;
+            var isCompleted = !isEmpty && oldCourses.OrderByDescending(c => c.CreatedAt).First().Status == StudentCourseStatus.Statuses.Completed;
             if(isCompleted)
                 throw new ArgumentException($"student {this.Id} has completed course {course.Id} already");
 
-            var isEnrolled = !isEmpty && oldCourses.OrderByDescending(c => c.Date).First().Status == StudentCourseStatus.Statuses.Enrolled;
+            var isEnrolled = !isEmpty && oldCourses.OrderByDescending(c => c.CreatedAt).First().Status == StudentCourseStatus.Statuses.Enrolled;
             if (!isEnrolled)
                 throw new ArgumentException($"student {this.Id} not enrolled in course {course.Id}");
-            
-            _courses.Add(new StudentCourseStatus(this, course, StudentCourseStatus.Statuses.Withdrawn, DateTime.UtcNow));
+
+            _courses.Add(StudentCourseStatus.Withdrawn(this, course));
             this.AddEvent(new StudentWithdrawn(this, course));
         }
 
@@ -85,7 +85,7 @@ namespace DDD.School
             if(oldCourses.Any(c => c.Status == StudentCourseStatus.Statuses.Withdrawn))
                 throw new ArgumentException($"student {this.Id} has withdrawn from course {course.Id}");
 
-            _courses.Add(new StudentCourseStatus(this, course, StudentCourseStatus.Statuses.Completed, DateTime.UtcNow));
+            _courses.Add(StudentCourseStatus.Completed(this, course));
             this.AddEvent(new CourseCompleted(this, course));
         }
     }

@@ -23,12 +23,12 @@ namespace DDD.School.Persistence.SQL.EntityConfigurations
             builder.OwnsMany(r => r.Courses, b =>
             {
                 b.ToTable("StudentCourses", "dbo")
-                    .HasKey(ur => new { StudentId = ur.StudentId, CourseId = ur.CourseId });
+                    .HasKey(ur => ur.Id);
 
                 b.Property(ur => ur.StudentId)
                     .UsePropertyAccessMode(PropertyAccessMode.Property);
 
-                b.Property(ur => ur.CourseId)
+                b.Property(ur => ur.CourseId) //TODO: FK is not generated
                     .UsePropertyAccessMode(PropertyAccessMode.Property);
             });
 

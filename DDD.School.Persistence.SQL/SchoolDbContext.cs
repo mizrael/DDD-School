@@ -15,9 +15,11 @@ namespace DDD.School.Persistence.SQL
         {
             modelBuilder.ApplyConfiguration(new CourseEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new StudentEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new MessageEntityTypeConfiguration());
         }
 
         public DbSet<Course> Courses { get; set; }
         public DbSet<Student> Students { get; set; }
+        public DbSet<Message> Messages { get; set; }
     }
 }
