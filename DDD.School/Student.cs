@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DDD.School.Events;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -46,7 +47,10 @@ namespace DDD.School
             var hasWithdrawn = !isEmpty && oldCourses.OrderByDescending(c => c.Date).First().Status == StudentCourseStatus.Statuses.Withdrawn;
 
             if (isEmpty || hasWithdrawn)
+            {
                 _courses.Add(new StudentCourseStatus(this, course, StudentCourseStatus.Statuses.Enrolled, DateTime.UtcNow));
+                this.AddEvent(new StudentEnrolled(this, course));
+            }
         }
 
         public void Withdraw(Course course)
@@ -67,6 +71,7 @@ namespace DDD.School
                 throw new ArgumentException($"student {this.Id} not enrolled in course {course.Id}");
             
             _courses.Add(new StudentCourseStatus(this, course, StudentCourseStatus.Statuses.Withdrawn, DateTime.UtcNow));
+            this.AddEvent(new StudentWithdrawn(this, course));
         }
 
         public void Complete(Course course)
@@ -81,6 +86,7 @@ namespace DDD.School
                 throw new ArgumentException($"student {this.Id} has withdrawn from course {course.Id}");
 
             _courses.Add(new StudentCourseStatus(this, course, StudentCourseStatus.Statuses.Completed, DateTime.UtcNow));
+            this.AddEvent(new CourseCompleted(this, course));
         }
     }
 }

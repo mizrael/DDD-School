@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using DDD.School.Events;
 using FluentAssertions;
 using Xunit;
 
@@ -84,6 +85,40 @@ namespace DDD.School.Tests.Unit
         }
 
         [Fact]
+        public void Enroll_should_publish_event()
+        {
+            var course = new Course(Guid.NewGuid(), "course");
+            var sut = new Student(Guid.NewGuid(), "firstname", "lastname");
+
+            sut.Courses.Should().BeEmpty();
+            sut.Events.Should().BeEmpty();
+
+            sut.Enroll(course);
+
+            sut.Events.Count.Should().Be(1);
+
+            var @event = sut.Events.First() as StudentEnrolled;
+            @event.Should().NotBeNull();
+            @event.Student.Should().Be(sut);
+            @event.Course.Should().Be(course);
+        }
+
+        [Fact]
+        public void Enroll_should_not_republish_event()
+        {
+            var course = new Course(Guid.NewGuid(), "course");
+            var sut = new Student(Guid.NewGuid(), "firstname", "lastname");
+
+            sut.Events.Should().BeEmpty();
+
+            sut.Enroll(course);
+            sut.Events.Count.Should().Be(1);
+
+            sut.Enroll(course);
+            sut.Events.Count.Should().Be(1);
+        }
+
+        [Fact]
         public void Withdraw_should_update_course_status()
         {
             var course = new Course(Guid.NewGuid(), "course");
@@ -94,6 +129,24 @@ namespace DDD.School.Tests.Unit
 
             sut.Courses.ElementAt(0).Status.Should().Be(StudentCourseStatus.Statuses.Enrolled);
             sut.Courses.ElementAt(1).Status.Should().Be(StudentCourseStatus.Statuses.Withdrawn);
+        }
+
+        [Fact]
+        public void Withdraw_should_publish_event()
+        {
+            var course = new Course(Guid.NewGuid(), "course");
+            var sut = new Student(Guid.NewGuid(), "firstname", "lastname");
+
+            sut.Enroll(course);
+
+            sut.Withdraw(course);
+
+            sut.Events.Count.Should().Be(2);
+
+            var @event = sut.Events.ElementAt(1) as StudentWithdrawn;
+            @event.Should().NotBeNull();
+            @event.Student.Should().Be(sut);
+            @event.Course.Should().Be(course);
         }
 
         [Fact]
@@ -152,6 +205,24 @@ namespace DDD.School.Tests.Unit
             sut.Complete(course);
             sut.Courses.ElementAt(0).Status.Should().Be(StudentCourseStatus.Statuses.Enrolled);
             sut.Courses.ElementAt(1).Status.Should().Be(StudentCourseStatus.Statuses.Completed);
+        }
+
+        [Fact]
+        public void Complete_should_publish_event()
+        {
+            var course = new Course(Guid.NewGuid(), "course");
+            var sut = new Student(Guid.NewGuid(), "firstname", "lastname");
+
+            sut.Enroll(course);
+
+            sut.Complete(course);
+
+            sut.Events.Count.Should().Be(2);
+
+            var @event = sut.Events.ElementAt(1) as CourseCompleted;
+            @event.Should().NotBeNull();
+            @event.Student.Should().Be(sut);
+            @event.Course.Should().Be(course);
         }
     }
 }

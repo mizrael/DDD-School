@@ -1,10 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace DDD.School
 {
     public abstract class BaseEntity<TKey>
     {
+        protected BaseEntity()
+        {
+            _events = new List<IDomainEvent>();
+        }
+
+        private readonly IList<IDomainEvent> _events;
+
+        public IReadOnlyCollection<IDomainEvent> Events => _events.ToImmutableArray();
+
+        protected void AddEvent<TE>(TE @event) where TE:IDomainEvent
+        {
+            _events.Add(@event);
+        }
+
         public TKey Id { get; protected set; }
 
         public override bool Equals(object obj)
@@ -30,4 +45,6 @@ namespace DDD.School
             return !(entity1 == entity2);
         }
     }
+
+    public interface IDomainEvent { }
 }
