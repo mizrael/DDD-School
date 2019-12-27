@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace DDD.School.Services
 {
     public interface IMessageProcessor
     {
-        Task ProcessMessagesAsync(int batchSize);
+        Task ProcessMessagesAsync(int batchSize, CancellationToken cancellationToken);
     }
 }

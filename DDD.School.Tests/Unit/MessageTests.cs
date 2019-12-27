@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using DDD.School.Services;
 using FluentAssertions;
@@ -40,9 +41,9 @@ namespace DDD.School.Tests.Unit
 
             var publisher = Substitute.For<IMessagePublisher>();
 
-            await sut.Process(publisher);
+            await sut.Process(publisher, CancellationToken.None);
 
-            publisher.Received(1).PublishAsync(sut);
+            publisher.Received(1).PublishAsync(sut, CancellationToken.None);
 
             sut.ProcessedAt.Should().NotBeNull();
         }

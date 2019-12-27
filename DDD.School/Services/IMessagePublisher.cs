@@ -6,7 +6,7 @@ namespace DDD.School.Services
 {
     public interface IMessagePublisher
     {
-        Task PublishAsync(Message message);
+        Task PublishAsync(Message message, System.Threading.CancellationToken cancellationToken);
     }
 
     public class FakeMessagePublisher : IMessagePublisher
@@ -18,7 +18,7 @@ namespace DDD.School.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Task PublishAsync(Message message)
+        public Task PublishAsync(Message message, System.Threading.CancellationToken cancellationToken)
         {
             _logger.LogInformation($"processing message {message.Id}...");
             _logger.LogInformation($"message {message.Id} processed!");

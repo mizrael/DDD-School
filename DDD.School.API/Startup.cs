@@ -1,7 +1,10 @@
 using DDD.School.API.Services;
+using DDD.School.Persistence;
+using DDD.School.Persistence.SQL;
 using DDD.School.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,8 +14,11 @@ namespace DDD.School.API
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IWebHostEnvironment _env;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
+            _env = env;
             Configuration = configuration;
         }
 
@@ -22,6 +28,23 @@ namespace DDD.School.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddDbContextPool<SchoolDbContext>(builder =>
+            {
+                if (_env.IsDevelopment())
+                    builder.EnableSensitiveDataLogging(true);
+
+                var connStr = this.Configuration.GetConnectionString("db");
+                builder.UseSqlServer(connStr);
+            });
+
+            services.AddSingleton<IEventSerializer, JsonEventSerializer>();
+
+            services.AddTransient<ICoursesRepository, CoursesRepository>();
+            services.AddTransient<IStudentsRepository, StudentsRepository>();
+            services.AddTransient<IMessagesRepository, MessagesRepository>();
+            services.AddTransient<ISchoolUnitOfWork, SchoolUnitOfWork>();
+
             services.AddSingleton<IMessagePublisher, FakeMessagePublisher>();
             services.AddSingleton<IMessageProcessor, MessageProcessor>();
             services.AddSingleton(new MessageProcessorTaskOptions(TimeSpan.FromSeconds(10), 10));

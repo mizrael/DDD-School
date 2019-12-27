@@ -1,6 +1,7 @@
 ﻿using DDD.School.Persistence;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DDD.School.Services
@@ -20,16 +21,16 @@ namespace DDD.School.Services
         }
 
 
-        public async Task ProcessMessagesAsync(int batchSize)
+        public async Task ProcessMessagesAsync(int batchSize, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Fetching messages...");
 
-            var messages = await _unitOfWork.MessagesRepository.FetchUnprocessedAsync(batchSize);
+            var messages = await _unitOfWork.MessagesRepository.FetchUnprocessedAsync(batchSize, cancellationToken);
             foreach (var message in messages)
             {
                 try
                 {
-                    await message.Process(_publisher);
+                    await message.Process(_publisher, cancellationToken);
                 }
                 catch (Exception ex)
                 {

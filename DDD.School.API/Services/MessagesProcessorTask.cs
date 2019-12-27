@@ -40,7 +40,7 @@ namespace DDD.School.API.Services
             {
                 _logger.LogInformation("Processing new messages..."); 
                 
-                await _processor.ProcessMessagesAsync(_options.BatchSize);
+                await _processor.ProcessMessagesAsync(_options.BatchSize, stoppingToken);
 
                 _logger.LogInformation($"Messages processed, next execution in {_options.Interval}.");
 

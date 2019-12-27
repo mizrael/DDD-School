@@ -19,9 +19,9 @@ namespace DDD.School
         public string Type { get; }
         public string Payload { get; }
 
-        public async Task Process(IMessagePublisher publisher)
+        public async Task Process(IMessagePublisher publisher, System.Threading.CancellationToken cancellationToken)
         {
-            await publisher.PublishAsync(this);
+            await publisher.PublishAsync(this, cancellationToken);
             this.ProcessedAt = DateTime.UtcNow;
         }
 

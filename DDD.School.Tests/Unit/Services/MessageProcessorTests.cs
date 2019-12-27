@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -22,7 +23,7 @@ namespace DDD.School.Tests.Unit.Services
                 .ToArray();
 
             var messagesRepository = Substitute.For<IMessagesRepository>();
-            messagesRepository.FetchUnprocessedAsync(Arg.Any<int>())
+            messagesRepository.FetchUnprocessedAsync(Arg.Any<int>(), Arg.Any<CancellationToken>())
                 .ReturnsForAnyArgs(messages);
             
             var unitOfWork = Substitute.For<ISchoolUnitOfWork>();
@@ -33,7 +34,7 @@ namespace DDD.School.Tests.Unit.Services
 
             var sut = new MessageProcessor(unitOfWork, publisher, logger);
 
-            await sut.ProcessMessagesAsync(batchSize);
+            await sut.ProcessMessagesAsync(batchSize, CancellationToken.None);
 
             messages.All(m => m.ProcessedAt != null)
                 .Should()
@@ -57,7 +58,7 @@ namespace DDD.School.Tests.Unit.Services
                 .ToList();
 
             var messagesRepository = Substitute.For<IMessagesRepository>();
-            messagesRepository.FetchUnprocessedAsync(Arg.Any<int>())
+            messagesRepository.FetchUnprocessedAsync(Arg.Any<int>(), Arg.Any<CancellationToken>())
                 .ReturnsForAnyArgs(messages);
 
             var unitOfWork = Substitute.For<ISchoolUnitOfWork>();
@@ -67,12 +68,12 @@ namespace DDD.School.Tests.Unit.Services
             var publisher = Substitute.For<IMessagePublisher>();
 
             int callCount = 0;
-            publisher.WhenForAnyArgs(p => p.PublishAsync(Arg.Any<Message>()))
+            publisher.WhenForAnyArgs(p => p.PublishAsync(Arg.Any<Message>(), Arg.Any<CancellationToken>()))
                 .Do(i => { if (callCount++ % 2 == 0) throw new Exception(); });
 
             var sut = new MessageProcessor(unitOfWork, publisher, logger);
 
-            await sut.ProcessMessagesAsync(batchSize);
+            await sut.ProcessMessagesAsync(batchSize, CancellationToken.None);
 
             int messageIndex = 0;
             foreach(var message in messages)
