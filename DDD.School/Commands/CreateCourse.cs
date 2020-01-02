@@ -40,7 +40,7 @@ namespace DDD.School.Commands
                 result.AddError(nameof(CreateCourse.CourseId), $"there is already a course with id {command.CourseId}");
 
             var coursesByTitle = await _unitOfWork.CoursesRepository.FindAsync(
-                u => command.CourseTitle.Equals(u.Title, StringComparison.InvariantCultureIgnoreCase), cancellationToken);
+                u => u.Title == command.CourseTitle, cancellationToken);
             if (null != coursesByTitle && coursesByTitle.Any())
                 result.AddError(nameof(CreateCourse.CourseTitle), $"there is already a course with title {command.CourseTitle}");
         }

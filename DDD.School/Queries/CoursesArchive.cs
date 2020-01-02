@@ -27,4 +27,5 @@ namespace DDD.School.Queries
         public Guid Id { get; }
         public string Title { get; }
     }
+
 }
