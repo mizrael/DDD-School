@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using DDD.School.API.Extensions;
+using DDD.School.API.Middlewares;
 
 namespace DDD.School.API
 {
@@ -67,10 +68,10 @@ namespace DDD.School.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            app.UseMiddleware<ExceptionsMiddleware>();
+
+            if (!env.IsDevelopment())
+                app.UseHsts();
 
             app.UseHttpsRedirection();
 
