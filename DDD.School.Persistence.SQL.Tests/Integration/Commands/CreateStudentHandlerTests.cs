@@ -30,7 +30,7 @@ namespace DDD.School.Persistence.SQL.Tests.Integration.Commands
 
             var unitOfWork = new SchoolUnitOfWork(dbContext, coursesRepo, studentsRepo, messagesRepository, eventSerializer);
 
-            var sut = new CreateStudentHandler(new NullValidator<CreateStudent>(), unitOfWork);
+            var sut = new CreateStudentHandler(new FakeValidator<CreateStudent>(), unitOfWork);
 
             var command = new CreateStudent(Guid.NewGuid(), "new", "student");
             await sut.Handle(command, CancellationToken.None);

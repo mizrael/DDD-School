@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace DDD.School.API
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {
