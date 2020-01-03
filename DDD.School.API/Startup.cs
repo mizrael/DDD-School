@@ -60,7 +60,7 @@ namespace DDD.School.API
 
             services.AddSingleton<IMessagePublisher, FakeMessagePublisher>();
             services.AddScoped<IMessageProcessor, MessageProcessor>();
-
+            
             services.AddSingleton(new MessageProcessorTaskOptions(TimeSpan.FromSeconds(10), 10));
             services.AddHostedService<MessagesProcessorTask>();
         }
@@ -69,7 +69,7 @@ namespace DDD.School.API
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseMiddleware<ExceptionsMiddleware>();
-
+            
             if (!env.IsDevelopment())
                 app.UseHsts();
 
