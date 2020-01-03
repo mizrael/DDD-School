@@ -21,14 +21,14 @@ namespace DDD.School.API.Controllers
             _mediator = mediator;
         }
 
-        //[HttpGet]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //public async Task<IActionResult> Get(int page=0, int pageSize=10)
-        //{
-        //    var query = new StudentsArchive(page, pageSize);
-        //    var results = await _mediator.Send(query);
-        //    return Ok(results);
-        //}
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Get(int page = 0, int pageSize = 10)
+        {
+            var query = new StudentsArchive(page, pageSize);
+            var results = await _mediator.Send(query);
+            return Ok(results);
+        }
 
         [HttpGet, Route("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
