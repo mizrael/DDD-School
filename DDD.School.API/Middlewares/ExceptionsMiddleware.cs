@@ -6,6 +6,10 @@ using System.Net.Http;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace DDD.School.API.Middlewares
 {
@@ -14,11 +18,13 @@ namespace DDD.School.API.Middlewares
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<ExceptionsMiddleware> _logger;
+        private readonly ProblemDetailsFactory _problemDetailsFactory;
 
-        public ExceptionsMiddleware(RequestDelegate next, ILogger<ExceptionsMiddleware> logger)
+        public ExceptionsMiddleware(RequestDelegate next, ILogger<ExceptionsMiddleware> logger, ProblemDetailsFactory problemDetailsFactory)
         {
             _next = next;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _problemDetailsFactory = problemDetailsFactory ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task Invoke(HttpContext context)
@@ -35,34 +41,34 @@ namespace DDD.School.API.Middlewares
 
         private async Task HandleException(HttpContext context, Exception ex)
         {
-            var error = ExtractError(ex);
-            string jsonData = System.Text.Json.JsonSerializer.Serialize(error);
+            var status = ExtractHttpStatus(ex);
 
-            context.Response.StatusCode = (int)ExtractHttpStatus(ex);
-            context.Response.ContentType = "application/json";
+            var problemDetails = BuildProblemDetails(ex, status, context);
+            var detailsType = problemDetails.GetType();
+            var jsonData = System.Text.Json.JsonSerializer.Serialize(problemDetails, detailsType);
+
+            context.Response.StatusCode = status;
+            context.Response.ContentType = "application/problem+json";
+            
             await context.Response.WriteAsync(jsonData);
 
             _logger.LogError(ex, ex.Message);
         }
 
-        private static dynamic ExtractError<TEx>(TEx ex) where TEx : Exception
+        private ProblemDetails BuildProblemDetails<TEx>(TEx ex, int status, HttpContext context) where TEx : Exception
         {
             if (ex is ValidationException valEx)
             {
-                return new
-                {
-                    message = valEx.Message,
-                    data = valEx.Errors
-                };
+                var state = new ModelStateDictionary();
+                foreach (var err in valEx.Errors)
+                    state.AddModelError(err.Context, err.Message);
+                return _problemDetailsFactory.CreateValidationProblemDetails(context, state, status, ex.Message, null, null, context.Request.Path);
             }
 
-            return new
-            {
-                message = ex.Message
-            };
+            return _problemDetailsFactory.CreateProblemDetails(context, status, ex.Message, null, null, context.Request.Path);      
         }
 
-        private static HttpStatusCode ExtractHttpStatus<TEx>(TEx ex) where TEx : Exception
+        private static int ExtractHttpStatus<TEx>(TEx ex) where TEx : Exception
         {
             var status = HttpStatusCode.InternalServerError;
 
@@ -77,7 +83,7 @@ namespace DDD.School.API.Middlewares
             else if (ex is UnauthorizedAccessException)
                 status = HttpStatusCode.Forbidden;
 
-            return status;
+            return (int)status;
         }
     }
 }
