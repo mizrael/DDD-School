@@ -11,7 +11,7 @@
   "profiles": {
     "DDD.School.API": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "api/courses",
       "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "environmentVariables": {
