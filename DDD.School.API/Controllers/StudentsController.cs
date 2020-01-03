@@ -51,5 +51,23 @@ namespace DDD.School.API.Controllers
             await _mediator.Publish(command);
             return CreatedAtAction("GetById", new { id = dto.Id }, dto.Id);
         }
+
+        [HttpPut, Route("{id:guid}/enroll/{courseId:guid}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Enroll([FromRoute]Guid id, [FromRoute]Guid courseId)
+        {            
+            var command = new Enroll(courseId, id);
+            await _mediator.Publish(command);
+            return CreatedAtAction("GetById", new { id = id }, id);
+        }
+
+        [HttpPut, Route("{id:guid}/withdraw/{courseId:guid}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Withdraw([FromRoute]Guid id, [FromRoute]Guid courseId)
+        {
+            var command = new Withdraw(courseId, id);
+            await _mediator.Publish(command);
+            return CreatedAtAction("GetById", new { id = id }, id);
+        }
     }
 }
