@@ -10,7 +10,9 @@ namespace DDD.School.Services
         {
             if (null == @event)
                 throw new ArgumentNullException(nameof(@event));
-            return JsonSerializer.Serialize(@event);
+            var eventType = @event.GetType();
+            var result = JsonSerializer.Serialize(@event, eventType);
+            return result;
         }
     }
 }
