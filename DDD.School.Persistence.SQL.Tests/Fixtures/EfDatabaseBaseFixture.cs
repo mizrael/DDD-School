@@ -33,6 +33,7 @@ namespace DDD.School.Persistence.SQL.Tests.Fixtures
 
             _options = new DbContextOptionsBuilder<TDb>()
                 .UseSqlServer(this.ConnectionString)
+                .EnableSensitiveDataLogging()
                 .Options;
         }
 
@@ -42,6 +43,7 @@ namespace DDD.School.Persistence.SQL.Tests.Fixtures
             {
                 var ctx = BuildDbContext(_options);
                 ctx?.Database?.EnsureCreated();
+                
                 return ctx;
             }
             catch (Exception ex)
