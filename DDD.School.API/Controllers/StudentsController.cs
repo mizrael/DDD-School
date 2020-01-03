@@ -58,7 +58,7 @@ namespace DDD.School.API.Controllers
         {            
             var command = new Enroll(courseId, id);
             await _mediator.Publish(command);
-            return CreatedAtAction("GetById", new { id = id }, id);
+            return Ok();
         }
 
         [HttpPut, Route("{id:guid}/withdraw/{courseId:guid}")]
@@ -67,7 +67,7 @@ namespace DDD.School.API.Controllers
         {
             var command = new Withdraw(courseId, id);
             await _mediator.Publish(command);
-            return CreatedAtAction("GetById", new { id = id }, id);
+            return Ok();
         }
     }
 }
