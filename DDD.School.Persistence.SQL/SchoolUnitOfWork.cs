@@ -32,7 +32,7 @@ namespace DDD.School.Persistence.SQL
                                          .Where(e => e.Entity is IHasEvents c && c.Events.Any())
                                          .Select(e => e.Entity as IHasEvents)
                                          .ToArray();
-            foreach(var entity in entities)
+            foreach (var entity in entities)
             {
                 var messages = entity.Events.Select(e => Message.FromDomainEvent(e, _eventSerializer))
                                             .ToArray();

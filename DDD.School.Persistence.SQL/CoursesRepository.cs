@@ -19,15 +19,15 @@ namespace DDD.School.Persistence.SQL
 
         public Task<Course> FindByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            return _dbContext.Courses.FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
+            return _dbContext.Courses
+                            .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
         }
 
         public async Task<IEnumerable<Course>> FindAsync(Expression<Func<Course, bool>> query, CancellationToken cancellationToken)
         {
-            IEnumerable<Course> results = await _dbContext.Courses.Where(query)
-                .ToArrayAsync(cancellationToken)
-                .ConfigureAwait(false);
-            return results;
+            return await _dbContext.Courses
+                .Where(query)
+                .ToArrayAsync(cancellationToken);
         }
 
         public async Task CreateAsync(Course course, CancellationToken cancellationToken)

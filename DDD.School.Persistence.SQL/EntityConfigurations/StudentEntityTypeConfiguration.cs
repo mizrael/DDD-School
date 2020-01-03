@@ -25,11 +25,18 @@ namespace DDD.School.Persistence.SQL.EntityConfigurations
                 b.ToTable("StudentCourses", "dbo")
                     .HasKey(ur => ur.Id);
 
+                b.Property(ur => ur.Id).IsRequired().ValueGeneratedNever();
+
                 b.Property(ur => ur.StudentId)
+                    .IsRequired()
                     .UsePropertyAccessMode(PropertyAccessMode.Property);
 
                 b.Property(ur => ur.CourseId) //TODO: FK is not generated
+                    .IsRequired()
                     .UsePropertyAccessMode(PropertyAccessMode.Property);
+
+                b.Property(ur => ur.CreatedAt);
+                b.Property(ur => ur.Status);
             });
 
             var nav = builder.Metadata.FindNavigation(nameof(Student.Courses));

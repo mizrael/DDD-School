@@ -54,7 +54,9 @@ namespace DDD.School.Commands
         {
             var course = await _unitOfWork.CoursesRepository.FindByIdAsync(command.CourseId, cancellationToken); 
             var student = await _unitOfWork.StudentsRepository.FindByIdAsync(command.StudentId, cancellationToken);
+
             student.Enroll(course);
+
             await _unitOfWork.CommitAsync(cancellationToken);
         }
     }

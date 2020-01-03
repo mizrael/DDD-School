@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +16,8 @@ namespace DDD.School.Persistence.SQL
 
         public Task<Student> FindByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            return _dbContext.Students.FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
+            return _dbContext.Students
+                            .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
         }
 
         public async Task CreateAsync(Student student, CancellationToken cancellationToken)
