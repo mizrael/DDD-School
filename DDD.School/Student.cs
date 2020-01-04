@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace DDD.School
 {
-    public class Student : BaseEntity<Guid>, IAggregateRoot
+    public class Student : BaseAggregateRoot<Guid>
     {
         public Student(Guid id, string firstname, string lastname)
         {

@@ -4,10 +4,9 @@ using System.Collections.Immutable;
 
 namespace DDD.School
 {
-
-    public abstract class BaseEntity<TKey> : IHasEvents
+    public abstract class BaseAggregateRoot<TKey> : BaseEntity<TKey>, IAggregateRoot
     {
-        protected BaseEntity()
+        protected BaseAggregateRoot()
         {
             _events = new List<IDomainEvent>();
         }
@@ -21,11 +20,14 @@ namespace DDD.School
             _events.Clear();
         }
 
-        protected void AddEvent<TE>(TE @event) where TE:IDomainEvent
+        protected void AddEvent<TE>(TE @event) where TE : IDomainEvent
         {
             _events.Add(@event);
         }
+    }
 
+    public abstract class BaseEntity<TKey> 
+    {
         public TKey Id { get; protected set; }
 
         public override bool Equals(object obj)

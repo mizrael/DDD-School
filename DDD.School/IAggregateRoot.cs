@@ -1,4 +1,10 @@
-﻿namespace DDD.School
+﻿using System.Collections.Generic;
+
+namespace DDD.School
 {
-    public interface IAggregateRoot { }
+    public interface IAggregateRoot {
+        IReadOnlyCollection<IDomainEvent> Events { get; }
+
+        void ClearEvents();
+    }
 }

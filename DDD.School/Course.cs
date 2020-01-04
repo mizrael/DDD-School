@@ -2,7 +2,7 @@
 
 namespace DDD.School
 {
-    public class Course : BaseEntity<Guid>, IAggregateRoot
+    public class Course : BaseAggregateRoot<Guid>
     {
         public Course(Guid id, string title)
         {

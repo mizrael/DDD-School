@@ -29,8 +29,8 @@ namespace DDD.School.Persistence.SQL
         protected override Task BeforeCommitAsync(CancellationToken cancellationToken)
         {
             var entities = this.DbContext.ChangeTracker.Entries()
-                                         .Where(e => e.Entity is IHasEvents c && c.Events.Any())
-                                         .Select(e => e.Entity as IHasEvents)
+                                         .Where(e => e.Entity is IAggregateRoot c && c.Events.Any())
+                                         .Select(e => e.Entity as IAggregateRoot)
                                          .ToArray();
             foreach (var entity in entities)
             {
